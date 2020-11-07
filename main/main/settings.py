@@ -39,7 +39,7 @@ DEFAULT_APPS = [
     "django.contrib.staticfiles",
 ]
 
-AVAILABLE_APPS = ["server"]
+AVAILABLE_APPS = ["server", "backup"]
 
 INSTALLED_APPS = DEFAULT_APPS + AVAILABLE_APPS
 
@@ -122,3 +122,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = "/static/"
+
+MEDIA_ROOT = BASE_DIR / "uploaded_files"
