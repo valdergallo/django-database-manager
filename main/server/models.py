@@ -40,7 +40,6 @@ class Database(models.Model):
     storage_type = models.ForeignKey(
         UploadStorageConfig,
         on_delete=models.CASCADE,
-        editable=False,
         null=True,
         blank=True,
     )

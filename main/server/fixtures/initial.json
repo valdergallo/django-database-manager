@@ -1,0 +1,56 @@
+[
+{
+    "model": "server.uploadstorageconfig",
+    "pk": 1,
+    "fields": {
+        "user": 1,
+        "storage_type": "AMS3",
+        "config_vars": "AWS_ACCESS_KEY_ID=test\r\nAWS_SECRET_ACCESS_KEY=test\r\nAWS_STORAGE_BUCKET_NAME=backup"
+    }
+},
+{
+    "model": "server.database",
+    "pk": 1,
+    "fields": {
+        "name": "nic",
+        "username": "nic",
+        "password": null,
+        "host": "localhost",
+        "ssl_key": "",
+        "active_to_backup": true,
+        "active_to_retore": true,
+        "user": 1,
+        "storage_type": 1
+    }
+},
+{
+    "model": "server.database",
+    "pk": 2,
+    "fields": {
+        "name": "kong",
+        "username": "nic",
+        "password": null,
+        "host": "localhost",
+        "ssl_key": "",
+        "active_to_backup": true,
+        "active_to_retore": true,
+        "user": 1,
+        "storage_type": 1
+    }
+},
+{
+    "model": "server.database",
+    "pk": 3,
+    "fields": {
+        "name": "factory",
+        "username": "nic",
+        "password": null,
+        "host": "localhost",
+        "ssl_key": "",
+        "active_to_backup": true,
+        "active_to_retore": true,
+        "user": 1,
+        "storage_type": 1
+    }
+}
+]

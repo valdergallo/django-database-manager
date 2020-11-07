@@ -4,6 +4,16 @@ from django.contrib import admin
 from .models import Database
 from .models import Server
 from .models import ServerGroup
+from .models import UploadStorageConfig
+
+
+class UploadStorageConfigAdmin(admin.ModelAdmin):
+    list_display = ("id", "storage_type")
+
+    def save_model(self, request, obj, form, change):
+        if not obj.user:
+            obj.user = request.user
+        obj.save()
 
 
 class ServerGroupAdmin(admin.ModelAdmin):
@@ -36,3 +46,4 @@ class DatabaseAdmin(admin.ModelAdmin):
 admin.site.register(Database, DatabaseAdmin)
 admin.site.register(Server, ServerAdmin)
 admin.site.register(ServerGroup, ServerGroupAdmin)
+admin.site.register(UploadStorageConfig, UploadStorageConfigAdmin)
