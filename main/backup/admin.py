@@ -4,6 +4,7 @@ from .models import Backup
 
 class BackupAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "status", "database", "server")
+    list_display_links = ("id", "name")
 
     def save_model(self, request, obj, form, change):
         if not obj.user:

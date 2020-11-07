@@ -18,6 +18,7 @@ class UploadStorageConfigAdmin(admin.ModelAdmin):
 
 class ServerGroupAdmin(admin.ModelAdmin):
     list_display = ("id", "name")
+    list_display_links = ("id", "name")
 
     def save_model(self, request, obj, form, change):
         if not obj.user:
@@ -27,6 +28,7 @@ class ServerGroupAdmin(admin.ModelAdmin):
 
 class ServerAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "host")
+    list_display_links = ("id", "name")
 
     def save_model(self, request, obj, form, change):
         if not obj.user:
@@ -36,6 +38,7 @@ class ServerAdmin(admin.ModelAdmin):
 
 class DatabaseAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "host", "username", "storage_type")
+    list_display_links = ("id", "name")
 
     def save_model(self, request, obj, form, change):
         if not obj.user:
