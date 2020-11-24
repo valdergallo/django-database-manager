@@ -96,7 +96,9 @@ class Server(models.Model):
         return f"{self.name} - {self.host}"
 
     def get_config(self):
-        return Config()
+        # TODO: create one SSH config
+        # return Config()
+        pass
 
     def get_keys(self):
         if self.ssh_key:
