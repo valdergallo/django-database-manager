@@ -46,6 +46,9 @@ class ConnectionKeys(models.Model):
     key_pass = models.CharField(max_length=250, null=True, blank=True)
     key_type = models.CharField(choices=KeyEnum.choices, max_length=5)
 
+    class Meta:
+        verbose_name_plural = "Connection Keys"
+
     def __str__(self):
         return f"{self.name}"
 
@@ -106,14 +109,3 @@ class Server(models.Model):
             port=self.connect_port,
             connect_kwargs=self.get_keys(),
         )
-
-
-class ServerGroup(models.Model):
-    name = models.CharField(max_length=250)
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, editable=False, null=True, blank=True
-    )
-    servers = models.ManyToManyField(Server, blank=True)
-
-    def __str__(self):
-        return f"{self.name}"

@@ -3,22 +3,12 @@ from django.contrib import admin
 # Register your models here.
 from .models import Database
 from .models import Server
-from .models import ServerGroup
+from .models import ConnectionKeys
 from .models import UploadStorageConfig
 
 
 class UploadStorageConfigAdmin(admin.ModelAdmin):
     list_display = ("id", "storage_type")
-
-    def save_model(self, request, obj, form, change):
-        if not obj.user:
-            obj.user = request.user
-        obj.save()
-
-
-class ServerGroupAdmin(admin.ModelAdmin):
-    list_display = ("id", "name")
-    list_display_links = ("id", "name")
 
     def save_model(self, request, obj, form, change):
         if not obj.user:
@@ -48,5 +38,5 @@ class DatabaseAdmin(admin.ModelAdmin):
 
 admin.site.register(Database, DatabaseAdmin)
 admin.site.register(Server, ServerAdmin)
-admin.site.register(ServerGroup, ServerGroupAdmin)
+admin.site.register(ConnectionKeys)
 admin.site.register(UploadStorageConfig, UploadStorageConfigAdmin)
