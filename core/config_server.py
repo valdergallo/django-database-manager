@@ -1,3 +1,7 @@
+from fabric import Connection
+from fabric import task
+
+
 @task(
     help={
         "env-name": "Name of the server which needs to be updated",
