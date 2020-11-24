@@ -7,28 +7,30 @@ import server.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('server', '0008_auto_20201107_1227'),
+        ("server", "0008_auto_20201107_1227"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='server',
-            name='connect_port',
-            field=models.CharField(default='22', max_length=4),
+            model_name="server",
+            name="connect_port",
+            field=models.CharField(default="22", max_length=4),
         ),
         migrations.AddField(
-            model_name='server',
-            name='gateway',
+            model_name="server",
+            name="gateway",
             field=models.CharField(blank=True, max_length=250, null=True),
         ),
         migrations.AlterField(
-            model_name='database',
-            name='ssl_key',
-            field=models.FileField(blank=True, null=True, upload_to=server.models.user_database_keys_path),
+            model_name="database",
+            name="ssl_key",
+            field=models.FileField(blank=True, null=True, upload_to="db"),
         ),
         migrations.AlterField(
-            model_name='server',
-            name='ssh_key',
-            field=models.FileField(blank=True, null=True, upload_to=server.models.user_server_keys_path),
+            model_name="server",
+            name="ssh_key",
+            field=models.FileField(
+                blank=True, null=True, upload_to=server.models.user_ssh_keys_path
+            ),
         ),
     ]

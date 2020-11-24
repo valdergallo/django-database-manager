@@ -15,6 +15,15 @@ class UploadServerProviderEnum(models.TextChoices):
     SFTP = "SFTP"
 
 
+class KeyEnum(models.TextChoices):
+    SSH = "SSH", "SSH"
+    SSL = "SSL", "SSL"
+
+
+def user_ssh_keys_path(instance, filename):
+    return f"ssh_keys/user_{instance.user.id}/{instance.name}/ssh/"
+
+
 class UploadStorageConfig(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, editable=False, null=True, blank=True
@@ -28,12 +37,17 @@ class UploadStorageConfig(models.Model):
         return self.storage_type
 
 
-def user_database_keys_path(instance, filename):
-    return f"ssh_keys/user_{instance.user.id}/{instance.name}/db/"
+class ConnectionKeys(models.Model):
+    name = models.CharField(max_length=250)
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, editable=False, null=True, blank=True
+    )
+    key = models.FileField(upload_to=user_ssh_keys_path, null=True, blank=True)
+    key_pass = models.CharField(max_length=250, null=True, blank=True)
+    key_type = models.CharField(choices=KeyEnum.choices, max_length=5)
 
-
-def user_server_keys_path(instance, filename):
-    return f"ssh_keys/user_{instance.user.id}/{instance.name}/server/"
+    def __str__(self):
+        return f"{self.name}"
 
 
 class Database(models.Model):
@@ -41,7 +55,9 @@ class Database(models.Model):
     username = models.CharField(max_length=200)
     password = models.CharField(max_length=200, null=True, blank=True)
     host = models.CharField(max_length=250, default="localhost")
-    ssl_key = models.FileField(upload_to=user_database_keys_path, null=True, blank=True)
+    ssl_key = models.ForeignKey(
+        ConnectionKeys, null=True, on_delete=models.CASCADE, default=None
+    )
     active_to_backup = models.BooleanField(default=True)
     active_to_retore = models.BooleanField(default=True)
     user = models.ForeignKey(
@@ -63,8 +79,9 @@ class Server(models.Model):
     host = models.CharField(max_length=250, default="localhost")
     connect_username = models.CharField(max_length=150, default="ubuntu")
     connect_port = models.CharField(max_length=4, default="22")
-    ssh_key = models.FileField(upload_to=user_server_keys_path, null=True, blank=True)
-    ssh_key_pass = models.CharField(max_length=250, null=True, blank=True)
+    ssh_key = models.ForeignKey(
+        ConnectionKeys, null=True, on_delete=models.CASCADE, default=None
+    )
     databases = models.ManyToManyField(Database, blank=True)
     gateway = models.CharField(max_length=250, null=True, blank=True)
     backup_dir = models.CharField(max_length=100, default="/backups/")
@@ -80,7 +97,7 @@ class Server(models.Model):
 
     def get_keys(self):
         if self.ssh_key:
-            return {"key_filename": self.ssh_key}
+            return {"key_filename": self.ssh_key.key}
 
     def get_connection(self):
         return Connection(
