@@ -25,6 +25,9 @@ def test_server_connection(server):
     [
         "get",
         "run",
+        "close",
+        "put",
+        "sudo",
     ],
 )
 def test_server_connection_functions(
