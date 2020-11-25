@@ -30,7 +30,7 @@ def test_server_connection(server):
         "sudo",
     ],
 )
-def test_server_connection_functions(
+def test_server_connection_interface(
     server,
     function_name,
 ):
