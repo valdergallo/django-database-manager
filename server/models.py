@@ -1,7 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from fabric import Connection
-from fabric.config import Config
 
 
 class UploadServerProviderEnum(models.TextChoices):
@@ -13,6 +11,7 @@ class UploadServerProviderEnum(models.TextChoices):
     FTP = "FTP"
     GOOGLE_CLOUD_STORAGE = "GCTG", "Google Cloud Storage"
     SFTP = "SFTP"
+    LOCAL = "LOCAL"
 
 
 class KeyEnum(models.TextChoices):
@@ -31,7 +30,10 @@ class UploadStorageConfig(models.Model):
     storage_type = models.CharField(
         choices=UploadServerProviderEnum.choices, max_length=5
     )
-    config_vars = models.TextField(max_length=500)
+    config_vars = models.TextField(max_length=500, null=True, blank=True)
+
+    class Meta:
+        verbose_name_plural = "Upload Storage Configs"
 
     def __str__(self):
         return self.storage_type
@@ -57,10 +59,6 @@ class Database(models.Model):
     name = models.CharField(max_length=250)
     username = models.CharField(max_length=200)
     password = models.CharField(max_length=200, null=True, blank=True)
-    host = models.CharField(max_length=250, default="localhost")
-    ssl_key = models.ForeignKey(
-        ConnectionKeys, null=True, on_delete=models.CASCADE, default=None
-    )
     active_to_backup = models.BooleanField(default=True)
     active_to_retore = models.BooleanField(default=True)
     user = models.ForeignKey(
@@ -74,7 +72,7 @@ class Database(models.Model):
     )
 
     def __str__(self):
-        return f"{self.name} - {self.host}"
+        return f"{self.name}"
 
 
 class Server(models.Model):
@@ -83,7 +81,7 @@ class Server(models.Model):
     connect_username = models.CharField(max_length=150, default="ubuntu")
     connect_port = models.CharField(max_length=4, default="22")
     ssh_key = models.ForeignKey(
-        ConnectionKeys, null=True, on_delete=models.CASCADE, default=None
+        ConnectionKeys, null=True, blank=True, on_delete=models.CASCADE, default=None
     )
     databases = models.ManyToManyField(Database, blank=True)
     gateway = models.CharField(max_length=250, null=True, blank=True)
@@ -95,17 +93,12 @@ class Server(models.Model):
     def __str__(self):
         return f"{self.name} - {self.host}"
 
-    def get_config(self):
-        # TODO: create one SSH config
-        # return Config()
-        pass
-
     def get_keys(self):
         if self.ssh_key:
             return {"key_filename": self.ssh_key.key}
 
     def get_connection(self):
-        return Connection(
+        return dict(
             host=self.host,
             user=self.connect_username,
             port=self.connect_port,

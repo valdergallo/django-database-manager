@@ -27,7 +27,7 @@ class ServerAdmin(admin.ModelAdmin):
 
 
 class DatabaseAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "host", "username", "storage_type")
+    list_display = ("id", "name", "username", "storage_type")
     list_display_links = ("id", "name")
 
     def save_model(self, request, obj, form, change):
