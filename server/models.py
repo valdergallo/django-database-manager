@@ -20,7 +20,7 @@ class KeyEnum(models.TextChoices):
 
 
 def user_ssh_keys_path(instance, filename):
-    return f"ssh_keys/user_{instance.user.id}/{instance.name}/ssh/"
+    return f"ssh_keys/user_{instance.user.id}/{instance.name}/ssh/{filename}"
 
 
 class UploadStorageConfig(models.Model):

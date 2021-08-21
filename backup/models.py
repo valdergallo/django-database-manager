@@ -34,7 +34,7 @@ class Backup(models.Model):
         on_delete=models.CASCADE,
     )
     description = models.CharField(max_length=500, null=True, blank=True)
-    filename = models.FileField(upload_to=user_directory_path)
+    filename = models.FileField(upload_to=user_directory_path, null=True, blank=True)
 
     def __str__(self):
         return f"{self.name} ({self.status}) | {self.server}"

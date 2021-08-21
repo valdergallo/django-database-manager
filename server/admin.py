@@ -36,7 +36,17 @@ class DatabaseAdmin(admin.ModelAdmin):
         obj.save()
 
 
+class ConnectionKeyAdmin(admin.ModelAdmin):
+    list_display = ("id", "name", "key_type")
+    list_display_links = ("id", "name")
+
+    def save_model(self, request, obj, form, change):
+        if not obj.user:
+            obj.user = request.user
+        obj.save()
+
+
 admin.site.register(Database, DatabaseAdmin)
 admin.site.register(Server, ServerAdmin)
-admin.site.register(ConnectionKeys)
+admin.site.register(ConnectionKeys, ConnectionKeyAdmin)
 admin.site.register(UploadStorageConfig, UploadStorageConfigAdmin)
