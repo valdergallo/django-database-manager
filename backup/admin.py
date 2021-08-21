@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Backup
+from .models import Backup, RestoreJob
 
 
 class BackupAdmin(admin.ModelAdmin):
@@ -12,4 +12,15 @@ class BackupAdmin(admin.ModelAdmin):
         obj.save()
 
 
+class RestoreAdmin(admin.ModelAdmin):
+    list_display = ("id", "status", "database", "server", "backup")
+    list_display_links = ("id", "backup", "server")
+
+    def save_model(self, request, obj, form, change):
+        if not obj.user:
+            obj.user = request.user
+        obj.save()
+
+
 admin.site.register(Backup, BackupAdmin)
+admin.site.register(RestoreJob, RestoreAdmin)
