@@ -24,7 +24,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get(
     "SECRET_KEY", "jlgvu$l52px^grzzrv+o93p59d@&etqah)mulixz+vuwlfb9wj"
 )
-RABBIT_HOST = os.environ.get("RABBIT_HOST", "localhost")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -48,6 +47,7 @@ THIRDY_APP = [
     "reset_migrations",
     "rest_framework",
     "rest_framework.authtoken",
+    'django_celery_results',
     "drf_yasg",
 ]
 
@@ -192,7 +192,9 @@ MAX_OBJECTS = 20
 
 # Celery Configuration Options
 
-CELERY_BROKER_URL = "amqp://%s" % RABBIT_HOST
+CELERY_BROKER_URL = 'amqp://guest:guest@0.0.0.0:5672/'
 CELERY_TIMEZONE = "America/Sao_Paulo"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
+
+CELERY_RESULT_BACKEND = 'django-db'

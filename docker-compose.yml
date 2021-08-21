@@ -1,0 +1,33 @@
+version: "3"
+services:
+  # db:
+  #   image: postgres:13
+  #   container_name: db
+  #   ports:
+  #     - "5432:5432"
+  #   restart: always
+  #   networks:
+  #     - webnet
+  #   environment:
+  #     - POSTGRES_PASSWORD=dbuddy
+  #     - POSTGRES_USER=dbuddy
+  #     - POSTGRES_DB=dbuddy
+  #   volumes:
+  #     - db-data:/var/lib/postgresql/data
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+      - RABBITMQ_MANAGEMENT_BIND_IP=0.0.0.0
+volumes:
+  pipstorage:
+  uploaded:
+  db-data:
+networks:
+  webnet:
