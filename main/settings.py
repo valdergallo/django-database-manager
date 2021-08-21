@@ -51,7 +51,7 @@ THIRDY_APP = [
     "drf_yasg",
 ]
 
-AVAILABLE_APPS = ["server", "backup"]
+AVAILABLE_APPS = ["server", "jobs"]
 
 INSTALLED_APPS = DEFAULT_APPS + AVAILABLE_APPS + THIRDY_APP
 

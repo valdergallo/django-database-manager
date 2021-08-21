@@ -40,7 +40,7 @@ class Backup(models.Model):
         return f"{self.name} ({self.status}) | {self.server}"
 
 
-class RestoreJob(models.Model):
+class Restore(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
         choices=StatusEnum.choices,

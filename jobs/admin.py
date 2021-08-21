@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Backup, RestoreJob
+from jobs.models import Backup, Restore
 
 
 class BackupAdmin(admin.ModelAdmin):
@@ -23,4 +23,4 @@ class RestoreAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Backup, BackupAdmin)
-admin.site.register(RestoreJob, RestoreAdmin)
+admin.site.register(Restore, RestoreAdmin)

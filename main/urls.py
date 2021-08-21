@@ -51,7 +51,8 @@ urlpatterns = [
     path("", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
     path("auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("token/", authtoken_view.obtain_auth_token, name="api_token_auth"),
-    path("", include("backup.urls")),
+    path("jobs/", include("jobs.urls")),
+    path("server/", include("server.urls")),
 ]
 
 

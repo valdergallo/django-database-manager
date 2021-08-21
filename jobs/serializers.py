@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Backup, RestoreJob
+from jobs.models import Backup, Restore
 
 
 class BackupSerializer(serializers.ModelSerializer):
@@ -10,8 +10,8 @@ class BackupSerializer(serializers.ModelSerializer):
         read_only_fields = ["user"]
 
 
-class RestoreJobSerializer(serializers.ModelSerializer):
+class RestoreSerializer(serializers.ModelSerializer):
     class Meta:
-        model = RestoreJob
+        model = Restore
         fields = "__all__"
         read_only_fields = ["user"]
