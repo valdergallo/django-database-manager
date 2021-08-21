@@ -1,56 +1,108 @@
 [
 {
-    "model": "server.uploadstorageconfig",
-    "pk": 1,
-    "fields": {
-        "user": 1,
-        "storage_type": "AMS3",
-        "config_vars": "AWS_ACCESS_KEY_ID=test\r\nAWS_SECRET_ACCESS_KEY=test\r\nAWS_STORAGE_BUCKET_NAME=backup"
-    }
+  "model": "server.uploadstorageconfig",
+  "pk": 1,
+  "fields": {
+    "user": 1,
+    "storage_type": "AMS3",
+    "config_vars": "AWS_ACCESS_KEY_ID=test\r\nAWS_SECRET_ACCESS_KEY=test\r\nAWS_STORAGE_BUCKET_NAME=backup"
+  }
 },
 {
-    "model": "server.database",
-    "pk": 1,
-    "fields": {
-        "name": "nic",
-        "username": "nic",
-        "password": null,
-        "host": "localhost",
-        "ssl_key": "",
-        "active_to_backup": true,
-        "active_to_retore": true,
-        "user": 1,
-        "storage_type": 1
-    }
+  "model": "server.uploadstorageconfig",
+  "pk": 2,
+  "fields": {
+    "user": 1,
+    "storage_type": "LOCAL",
+    "config_vars": "UPLOAD_PATH=/backups"
+  }
 },
 {
-    "model": "server.database",
-    "pk": 2,
-    "fields": {
-        "name": "kong",
-        "username": "nic",
-        "password": null,
-        "host": "localhost",
-        "ssl_key": "",
-        "active_to_backup": true,
-        "active_to_retore": true,
-        "user": 1,
-        "storage_type": 1
-    }
+  "model": "server.connectionkeys",
+  "pk": 1,
+  "fields": {
+    "name": "mark6",
+    "user": 1,
+    "key": "ssh_keys/user_1/mark6/ssh/mark6.pub",
+    "key_pass": null,
+    "key_type": "SSH"
+  }
 },
 {
-    "model": "server.database",
-    "pk": 3,
-    "fields": {
-        "name": "factory",
-        "username": "nic",
-        "password": null,
-        "host": "localhost",
-        "ssl_key": "",
-        "active_to_backup": true,
-        "active_to_retore": true,
-        "user": 1,
-        "storage_type": 1
-    }
+  "model": "server.database",
+  "pk": 1,
+  "fields": {
+    "name": "nic",
+    "username": "nic",
+    "password": "nic",
+    "active_to_backup": true,
+    "active_to_retore": true,
+    "user": 1,
+    "storage_type": 1
+  }
+},
+{
+  "model": "server.database",
+  "pk": 2,
+  "fields": {
+    "name": "kong",
+    "username": "nic",
+    "password": "nic",
+    "active_to_backup": true,
+    "active_to_retore": false,
+    "user": 1,
+    "storage_type": 1
+  }
+},
+{
+  "model": "server.database",
+  "pk": 3,
+  "fields": {
+    "name": "factory",
+    "username": "nic",
+    "password": "nic",
+    "active_to_backup": true,
+    "active_to_retore": true,
+    "user": 1,
+    "storage_type": 1
+  }
+},
+{
+  "model": "server.server",
+  "pk": 3,
+  "fields": {
+    "name": "core-dev",
+    "host": "54.193.107.36",
+    "connect_username": "ubuntu",
+    "connect_port": "22",
+    "ssh_key": 1,
+    "gateway": null,
+    "backup_dir": "/backups/",
+    "user": 1,
+    "databases": [
+      1,
+      2,
+      3
+    ]
+  }
+},
+{
+  "model": "server.server",
+  "pk": 4,
+  "fields": {
+    "name": "local",
+    "host": "localhost",
+    "connect_username": "ubuntu",
+    "connect_port": "22",
+    "ssh_key": 1,
+    "gateway": null,
+    "backup_dir": "/backups/",
+    "user": 1,
+    "databases": [
+      1,
+      2,
+      3
+    ]
+  }
 }
 ]
