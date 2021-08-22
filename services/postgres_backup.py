@@ -3,20 +3,21 @@ from django.core.files.base import ContentFile
 from jobs.models import Backup, JOB_STATUS
 from services.ssh_connection import backup_connection
 from tempfile import TemporaryFile
+import os
 
 DATE_NOW = time.strftime("%Y%m%d%H%M%S")
 
-def create_name(database, job):
+def create_name(job):
     if not job.name:
-        fname = f"{database.name}_{DATE_NOW}.sql.gz"
+        fname = f"{DATE_NOW}.sql.gz"
     else:
-        fname = f"{database.name}_{job.name}_{DATE_NOW}.sql.gz"
+        fname = f"{job.name}_{DATE_NOW}.sql.gz"
     return fname
 
 
 def download_backup_in_django_file(con, fname, server):
     print("Start download backup from server")
-    remote_name = server.backup_dir + fname
+    remote_name = os.path.join(server.backup_dir, fname)
 
     # create temp file to download
     local_file = TemporaryFile()
@@ -30,10 +31,11 @@ def download_backup_in_django_file(con, fname, server):
 
 
 def dump_data_in_server(con, fname, database, server):
-    print(f"Start pg_dump in server for {database.name} in {server.backup_dir}{fname}")
+    remote_name = os.path.join(server.backup_dir, fname)
+    print(f"Start pg_dump in server for {database.name} in {remote_name}")
     # postgres backup
     con.sudo(
-        f'su - postgres -c "pg_dump -b -O -x -o -Z9 -h {server.host} -U {database.username} -d {database.name} -f {server.backup_dir}{fname}"'
+        f'su - postgres -c "pg_dump -b -O -x -o -Z9 -h {server.host} -U {database.username} -d {database.name} -f {remote_name}"'
     )
 
 
@@ -49,7 +51,7 @@ def create_backup_file(backup_job_id=None, con=None):
     database = backup_job.database
     server = backup_job.server
 
-    fname = create_name(database, backup_job)
+    fname = create_name(backup_job)
 
     dump_data_in_server(con=con, fname=fname, database=database, server=server)
 
