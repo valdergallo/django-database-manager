@@ -2,6 +2,7 @@ from functools import wraps
 from fabric import Connection
 from jobs.models import JOB_STATUS, Backup
 
+
 def get_connection(server):
     return Connection(
         host=server.host,
