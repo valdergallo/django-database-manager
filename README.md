@@ -10,8 +10,30 @@ https://hackertarget.com/ssh-examples-tunnels/
 
 https://docs.fabfile.org/en/2.5/getting-started.htm
 
-# Extra projects
+# DEVELOP
 
-1. Fabric SSH commands
-2. NBTTy share prompt to http
-3. django-remote-submission (https://pypi.org/project/django-remote-submission/)
+# Start run RabbitMQ server
+
+> docker-compose up -d
+
+# Start django project
+
+> python -m venv .venv
+> source .venv/bin/activate
+> pip install -r requirements.txt
+
+# Run server
+
+> python manage.py runserver
+
+or
+
+> make runserver
+
+# Run Celery Worker
+
+> celery -A main worker -l INFO
+
+or
+
+> make worker
