@@ -7,7 +7,7 @@ def make_backup(modeladmin, request, queryset):
         instance.create_task()
 
 class BackupAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "status", "database", "server")
+    list_display = ("id", "name", "status", "description", "database", "server")
     list_display_links = ("id", "name")
     actions = [make_backup]
 
