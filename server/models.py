@@ -3,14 +3,15 @@ from django.contrib.auth.models import User
 
 
 class UploadServerProviderEnum(models.TextChoices):
+    # AMAZON_S3 = "AMS3", "Amazon S3"
+    # APACHE_LIBCLOUD = "ACLD", "Apache Libcloud"
+    # AZURE_STORAGE = "ASTG", "Azure Storage"
+    # DIGITAL_OCEAN = "DGON", "Digital Ocean"
+    # DROPBOX = "DRPB", "Dropbox"
+    # FTP = "FTP"
+    # GOOGLE_CLOUD_STORAGE = "GCTG", "Google Cloud Storage"
+    # SFTP = "SFTP"
     AMAZON_S3 = "AMS3", "Amazon S3"
-    APACHE_LIBCLOUD = "ACLD", "Apache Libcloud"
-    AZURE_STORAGE = "ASTG", "Azure Storage"
-    DIGITAL_OCEAN = "DGON", "Digital Ocean"
-    DROPBOX = "DRPB", "Dropbox"
-    FTP = "FTP"
-    GOOGLE_CLOUD_STORAGE = "GCTG", "Google Cloud Storage"
-    SFTP = "SFTP"
     LOCAL = "LOCAL"
 
 
@@ -95,12 +96,4 @@ class Server(models.Model):
 
     def get_keys(self):
         if self.ssh_key:
-            return {"key_filename": self.ssh_key.key}
-
-    def get_connection(self):
-        return dict(
-            host=self.host,
-            user=self.connect_username,
-            port=self.connect_port,
-            connect_kwargs=self.get_keys(),
-        )
+            return {"key_filename": [self.ssh_key.key.path]}

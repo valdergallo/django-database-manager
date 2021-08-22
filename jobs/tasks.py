@@ -2,10 +2,12 @@ from celery import shared_task
 
 
 @shared_task
-def add(x, y):
-    return x + y
+def create_backup_task(backp_instance_id):
+    from services.postgres_backup import create_backup_file
+    print('backp_instance_id ', backp_instance_id)
+    create_backup_file(backp_instance_id)
 
 
 @shared_task
-def mul(x, y):
+def retore_backup_task(x, y):
     return x * y

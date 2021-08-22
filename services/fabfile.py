@@ -6,92 +6,80 @@ import io
 import time
 import glob
 from pprint import pprint
-from const import ENVS, RESTORE_BLACK_LIST, GROUP_ENVS, HIDE_OUTPUT
+from server.models import Server
+from jobs.models import Backup
+from django.core.files.base import ContentFile
 
-DIRNAME = os.path.dirname(__file__)
 DATE_NOW = time.strftime("%Y%m%d%H%M%S")
 
+def get_connection(server):
+    return Connection(
+            host=server.host,
+            user=server.connect_username,
+            port=server.connect_port,
+            connect_kwargs=server.get_keys(),
+        )
 
-@task(
-    help={
-        "env-name": "Name of the server which needs to be updated",
-        "name-backup": "Backup point name",
-    }
-)
-def backup(arg, env_name=None, name_backup=None):
-    """
-    Create backup from database
-    Example:
-        fab backup -e dev
-        or
-        fab backup --env-name=dev --name-backup=sent_to_carreras
-        or
-        fab backup -e dev -n sent_to_carreras
-    """
-    try:
-        env = ENVS[env_name]
-    except KeyError:
-        print("Invalid environment keyname, check your constants")
+def backup_server(server_name=None, name_backup=None, backup_job=None):
+    server = Server.objects.filter(name=server_name)
+    if not server:
+        print("Invalid server name")
 
-    print(f"Start Backup in {env_name}")
+    print(f"Start Backup in {server_name}")
 
-    for host in env["hosts"]:
-        with Connection(host=host, user="ubuntu", connect_kwargs=env["keys"]) as con:
-            print(f"change user to postgres")
-            for db_name in env["databases"]:
-                create_backup_file(
-                    con,
-                    host,
-                    db_name,
-                    env_name,
-                    name_backup,
-                    env["backup_dir"],
-                    env["db_username"],
-                    env["db_host"],
-                )
-
+    with get_connection(server) as con:
+        print(f"change user to postgres")
+        for database in server.databases:
+            create_backup_file(
+                con,
+                server,
+                database,
+                name_backup,
+                backup_job,
+            )
     print("Backup finished")
 
 
 def create_backup_file(
     con,
-    host=None,
-    db_name=None,
-    env_name=None,
+    server=None,
+    database=None,
     name_backup=None,
-    backup_dir=None,
-    db_username=None,
-    db_host=None,
+    backup_job=None,
 ):
     "Create backup file in server and download file"
 
     if not name_backup:
-        fname = f"{db_name}_{DATE_NOW}.sql.gz"
+        fname = f"{database.name}_{DATE_NOW}.sql.gz"
     else:
-        fname = f"{db_name}_{name_backup}_{DATE_NOW}.sql.gz"
+        fname = f"{database.name}_{name_backup}_{DATE_NOW}.sql.gz"
 
-    if not os.path.exists(env_name):
-        os.makedirs(env_name)
+    if not backup_job:
+        backup_job = Backup.objects.create(
+            name=name_backup, user=server.user, database=database, server=server
+        )
 
-    print(f"Start pg_dump in server for {db_name} in {backup_dir}{fname}")
+    print(f"Start pg_dump in server for {database.name} in {server.backup_dir}{fname}")
 
     con.sudo(
-        f'su - postgres -c "pg_dump -b -O -x -o -Z9 -h {db_host} -U {db_username} -d {db_name} -f {backup_dir}{fname}"'
+        f'su - postgres -c "pg_dump -b -O -x -o -Z9 -h {server.host} -U {database.username} -d {database.name} -f {server.backup_dir}{fname}"'
     )
 
-    local_name = os.path.join(".", env_name, fname)
-    remote_name = backup_dir + fname
+    remote_name = server.backup_dir + fname
 
     print(f"Start download backup from server")
 
-    con.get(remote_name, local_name)
-    con.run(f"rm {backup_dir}{fname}")
+    local_file = ContentFile()
+    con.get(remote_name, local_file)
 
-    print(f"Backup for {db_name} done")
+    backup_job.filename.save(fname, local_file, save=False)
+    backup_job.save()
+
+    print(f"Backup for {database.name} done")
 
 
 def _generate_sql_to_drop_database(database_name, database_user, con, backup_dir):
-    ""
+    """"""
     filename = f"disconect_database_{database_name}.sql"
     disconect_file = f"/tmp/{filename}"
 
@@ -115,10 +103,10 @@ def _generate_sql_to_drop_database(database_name, database_user, con, backup_dir
     return f"{backup_dir}{filename}"
 
 
-def _generate_backup_filename(backup_name, db_name, env_name, backup_dir):
-    filename = f"{db_name}_{backup_name}.sql"
+def _generate_backup_filename(backup_name, database.name, server_name, backup_dir):
+    filename = f"{database.name}_{backup_name}.sql"
 
-    local_backup_name = os.path.join(DIRNAME, env_name, filename)
+    local_backup_name = os.path.join(DIRNAME, server_name, filename)
     remote_backup_name = os.path.join(backup_dir, filename)
 
     if not os.path.exists(local_backup_name):
@@ -127,20 +115,20 @@ def _generate_backup_filename(backup_name, db_name, env_name, backup_dir):
     return local_backup_name, remote_backup_name
 
 
-def _search_backup_file(backup_name, env_name, backup_dir):
-    files = glob.glob(f"./{env_name}/*.*")
+def _search_backup_file(backup_name, server_name, backup_dir):
+    files = glob.glob(f"./{server_name}/*.*")
     local_backup_name = [i for i in files if backup_name in i]
     remote_backup_name = [
-        i.replace(f"./{env_name}/", backup_dir) for i in local_backup_name
+        i.replace(f"./{server_name}/", backup_dir) for i in local_backup_name
     ]
 
     return local_backup_name, remote_backup_name
 
 
-def _remove_db_name_from_remote_backup_names(db_name, remote_backup_names):
+def _remove_database.name_from_remote_backup_names(database.name, remote_backup_names):
     key = None
     for key, name in enumerate(remote_backup_names):
-        if db_name in name:
+        if database.name in name:
             print("Remove from restore file: %s" % name)
             break
     if key is not None:
@@ -160,7 +148,7 @@ def _remove_db_name_from_remote_backup_names(db_name, remote_backup_names):
 )
 def restore(
     con,
-    env_name=None,
+    server_name=None,
     name_backup=None,
     database_name=None,
     database_user="nic",
@@ -174,7 +162,7 @@ def restore(
         fab restore -e qas -n mexico -t dev
     """
     try:
-        from_db = ENVS[env_name]
+        from_db = ENVS[server_name]
     except KeyError:
         print("Invalid environment keyname, check your constants")
 
@@ -193,53 +181,53 @@ def restore(
             host=host, user="ubuntu", connect_kwargs=target_db["keys"]
         ) as con:
             local_backup_names, remote_backup_names = _search_backup_file(
-                name_backup, env_name, target_db["backup_dir"]
+                name_backup, server_name, target_db["backup_dir"]
             )
 
             if not local_backup_names or not remote_backup_names:
-                print(f"No backup file for {name_backup} from {env_name}")
+                print(f"No backup file for {name_backup} from {server_name}")
                 continue
 
             upload_all_files(local_backup_names, target_db, con)
 
             # delete all tables
-            for db_index, db_name in enumerate(database_names):
+            for db_index, database.name in enumerate(database_names):
 
-                from_db_name = from_db["databases"][db_index]
-                to_db_name = target_db["databases"][db_index]
+                from_database.name = from_db["databases"][db_index]
+                to_database.name = target_db["databases"][db_index]
                 to_db_host = target_db["db_host"]
                 to_db_username = target_db["db_username"]
                 from_db_username = from_db["db_username"]
 
                 if (
-                    db_name in RESTORE_BLACK_LIST
-                    or from_db_name in RESTORE_BLACK_LIST
-                    or to_db_name in RESTORE_BLACK_LIST
+                    database.name in RESTORE_BLACK_LIST
+                    or from_database.name in RESTORE_BLACK_LIST
+                    or to_database.name in RESTORE_BLACK_LIST
                 ):
 
                     print("-" * 80)
-                    print(f"Restored bypass {db_name}")
-                    remote_backup_names = _remove_db_name_from_remote_backup_names(
-                        db_name, remote_backup_names
+                    print(f"Restored bypass {database.name}")
+                    remote_backup_names = _remove_database.name_from_remote_backup_names(
+                        database.name, remote_backup_names
                     )
                     print("-" * 80)
                     continue
 
-                print(f"Start reset database {db_name}")
+                print(f"Start reset database {database.name}")
 
                 disconect_file = _generate_sql_to_drop_database(
-                    db_name, database_user, con, target_db["backup_dir"]
+                    database.name, database_user, con, target_db["backup_dir"]
                 )
 
                 # restore all files
                 for remote_backup_name in remote_backup_names:
-                    if db_name in remote_backup_name:
+                    if database.name in remote_backup_name:
                         database_restore_actions(
                             con,
-                            from_db_name,
-                            to_db_name,
+                            from_database.name,
+                            to_database.name,
                             remote_backup_name,
-                            db_name,
+                            database.name,
                             disconect_file,
                             to_db_host,
                             to_db_username,
@@ -260,9 +248,9 @@ def restore(
         "limit": "Limit files",
     }
 )
-def list_backups(arg, env_name, limit=10):
+def list_backups(arg, server_name, limit=10):
     "List backup files"
-    files = glob.glob(f"./{env_name}/*.*")
+    files = glob.glob(f"./{server_name}/*.*")
     files.sort(key=os.path.getmtime)
     for file in files[:limit][::-1]:
         last_update = time.ctime(os.path.getmtime(file))
@@ -274,10 +262,10 @@ def list_backups(arg, env_name, limit=10):
         "env-name": "Server to restore backup",
     }
 )
-def list_hosts(con, env_name=None):
+def list_hosts(con, server_name=None):
     "List config hosts"
-    if env_name:
-        env = ENVS[env_name]
+    if server_name:
+        env = ENVS[server_name]
         pprint(env)
         print("")
     else:
@@ -290,7 +278,7 @@ def list_hosts(con, env_name=None):
         "env-name": "Name of the server which needs to be updated",
     }
 )
-def config(arg, env_name=None):
+def config(arg, server_name=None):
     """
     Create backup from database
     Example:
@@ -298,9 +286,9 @@ def config(arg, env_name=None):
         or
         fab config --env-name=dev
     """
-    env = ENVS[env_name]
+    env = ENVS[server_name]
 
-    print(f"Start config in {env_name}")
+    print(f"Start config in {server_name}")
 
     for host in env["hosts"]:
         with Connection(host=host, user="ubuntu", connect_kwargs=env["keys"]) as con:
@@ -375,25 +363,25 @@ def upload_all_files(local_backup_names, target_db, con):
 
 def database_restore_actions(
     con,
-    from_db_name,
-    to_db_name,
+    from_database.name,
+    to_database.name,
     remote_backup_name,
-    db_name,
+    database.name,
     disconect_file,
     to_db_host,
     to_db_username,
     from_db_username,
 ):
-    print(f"RESTORE BACKUP {remote_backup_name} in {db_name}")
+    print(f"RESTORE BACKUP {remote_backup_name} in {database.name}")
 
-    if from_db_name != to_db_name:
-        print(f"Rename database {from_db_name} to {to_db_name} in {disconect_file}")
+    if from_database.name != to_database.name:
+        print(f"Rename database {from_database.name} to {to_database.name} in {disconect_file}")
         # rename database name
-        con.sudo(f'sed -i "s/{from_db_name}/{to_db_name}/g" {disconect_file}')
+        con.sudo(f'sed -i "s/{from_database.name}/{to_database.name}/g" {disconect_file}')
 
-    print(f"DELETE DATABASE {db_name}")
+    print(f"DELETE DATABASE {database.name}")
     print(
-        f"Load {disconect_file} SQL in {to_db_host} with use: {to_db_username} to {to_db_name}"
+        f"Load {disconect_file} SQL in {to_db_host} with use: {to_db_username} to {to_database.name}"
     )
 
     # load database
@@ -403,10 +391,10 @@ def database_restore_actions(
     )
 
     print(
-        f"Load {remote_backup_name} SQL in {to_db_host} with use: {to_db_username} to {to_db_name}"
+        f"Load {remote_backup_name} SQL in {to_db_host} with use: {to_db_username} to {to_database.name}"
     )
     # load database
     con.sudo(
-        f"gunzip -k -c {remote_backup_name} | psql -U {to_db_username} -h {to_db_host} -d {to_db_name}",
+        f"gunzip -k -c {remote_backup_name} | psql -U {to_db_username} -h {to_db_host} -d {to_database.name}",
         hide=HIDE_OUTPUT,
     )
