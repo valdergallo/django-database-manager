@@ -6,76 +6,9 @@ import io
 import time
 import glob
 from pprint import pprint
-from server.models import Server
-from jobs.models import Backup
-from django.core.files.base import ContentFile
+
 
 DATE_NOW = time.strftime("%Y%m%d%H%M%S")
-
-def get_connection(server):
-    return Connection(
-            host=server.host,
-            user=server.connect_username,
-            port=server.connect_port,
-            connect_kwargs=server.get_keys(),
-        )
-
-def backup_server(server_name=None, name_backup=None, backup_job=None):
-    server = Server.objects.filter(name=server_name)
-    if not server:
-        print("Invalid server name")
-
-    print(f"Start Backup in {server_name}")
-
-    with get_connection(server) as con:
-        print(f"change user to postgres")
-        for database in server.databases:
-            create_backup_file(
-                con,
-                server,
-                database,
-                name_backup,
-                backup_job,
-            )
-    print("Backup finished")
-
-
-def create_backup_file(
-    con,
-    server=None,
-    database=None,
-    name_backup=None,
-    backup_job=None,
-):
-    "Create backup file in server and download file"
-
-    if not name_backup:
-        fname = f"{database.name}_{DATE_NOW}.sql.gz"
-    else:
-        fname = f"{database.name}_{name_backup}_{DATE_NOW}.sql.gz"
-
-    if not backup_job:
-        backup_job = Backup.objects.create(
-            name=name_backup, user=server.user, database=database, server=server
-        )
-
-    print(f"Start pg_dump in server for {database.name} in {server.backup_dir}{fname}")
-
-    con.sudo(
-        f'su - postgres -c "pg_dump -b -O -x -o -Z9 -h {server.host} -U {database.username} -d {database.name} -f {server.backup_dir}{fname}"'
-    )
-
-    remote_name = server.backup_dir + fname
-
-    print(f"Start download backup from server")
-
-    local_file = ContentFile()
-    con.get(remote_name, local_file)
-
-    backup_job.filename.save(fname, local_file, save=False)
-    backup_job.save()
-
-    print(f"Backup for {database.name} done")
 
 
 def _generate_sql_to_drop_database(database_name, database_user, con, backup_dir):
@@ -136,16 +69,7 @@ def _remove_database.name_from_remote_backup_names(database.name, remote_backup_
     return remote_backup_names
 
 
-@task(
-    help={
-        "env-name": "- Server to restore backup -",
-        "name-backup": "Backup date or point name",
-        "database-name": "Set only one database to be updated",
-        "database-user": "Set only one database user",
-        "target-name": "Server to restore backup. If null target-name will be the same that env-name",
-        "ignore-black-list": "Remove protection from restore ",
-    }
-)
+
 def restore(
     con,
     server_name=None,
@@ -257,21 +181,6 @@ def list_backups(arg, server_name, limit=10):
         print(f"{last_update} | {file}")
 
 
-@task(
-    help={
-        "env-name": "Server to restore backup",
-    }
-)
-def list_hosts(con, server_name=None):
-    "List config hosts"
-    if server_name:
-        env = ENVS[server_name]
-        pprint(env)
-        print("")
-    else:
-        for i in ENVS.keys():
-            print(f"- {i}")
-
 
 @task(
     help={
@@ -297,30 +206,6 @@ def config(arg, server_name=None):
             con.sudo("chmod 777 %s" % env["backup_dir"])
 
     print("Backup finished")
-
-
-@task(
-    help={
-        "host-name": "Name of the server which needs to be tested",
-    }
-)
-def test(arg, host_name):
-    """
-    Test database backup connection
-    Example:
-        fab test huru-demo
-    """
-    print(f"Start test in host: {host_name}")
-
-    env = ENVS[host_name]
-
-    for host in env["hosts"]:
-        with Connection(host=host, user="ubuntu", connect_kwargs=env["keys"]) as con:
-            con.run("uname -a")
-            con.run("echo $DATABASE_HOST")
-            con.run("echo $DATABASE_USER")
-
-    print("Test finished")
 
 
 @task(
