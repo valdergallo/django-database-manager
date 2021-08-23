@@ -1,0 +1,3 @@
+source .venv/bin/activate &> /dev/null
+export DATABASE_NAME=production
+export PYTHONPATH=$PWD
