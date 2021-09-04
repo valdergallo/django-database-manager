@@ -36,8 +36,8 @@ def _generate_sql_to_drop_database(database_name, database_user, con, backup_dir
     return f"{backup_dir}{filename}"
 
 
-def _generate_backup_filename(backup_name, database.name, server_name, backup_dir):
-    filename = f"{database.name}_{backup_name}.sql"
+def _generate_backup_filename(backup_name, database_name, server_name, backup_dir):
+    filename = f"{database_name}_{backup_name}.sql"
 
     local_backup_name = os.path.join(DIRNAME, server_name, filename)
     remote_backup_name = os.path.join(backup_dir, filename)
@@ -58,10 +58,10 @@ def _search_backup_file(backup_name, server_name, backup_dir):
     return local_backup_name, remote_backup_name
 
 
-def _remove_database.name_from_remote_backup_names(database.name, remote_backup_names):
+def _remove_database_name_from_remote_backup_names(database_name, remote_backup_names):
     key = None
     for key, name in enumerate(remote_backup_names):
-        if database.name in name:
+        if database_name in name:
             print("Remove from restore file: %s" % name)
             break
     if key is not None:
@@ -115,43 +115,43 @@ def restore(
             upload_all_files(local_backup_names, target_db, con)
 
             # delete all tables
-            for db_index, database.name in enumerate(database_names):
+            for db_index, database_name in enumerate(database_names):
 
-                from_database.name = from_db["databases"][db_index]
-                to_database.name = target_db["databases"][db_index]
+                from_database_name = from_db["databases"][db_index]
+                to_database_name = target_db["databases"][db_index]
                 to_db_host = target_db["db_host"]
                 to_db_username = target_db["db_username"]
                 from_db_username = from_db["db_username"]
 
                 if (
-                    database.name in RESTORE_BLACK_LIST
-                    or from_database.name in RESTORE_BLACK_LIST
-                    or to_database.name in RESTORE_BLACK_LIST
+                    database_name in RESTORE_BLACK_LIST
+                    or from_database_name in RESTORE_BLACK_LIST
+                    or to_database_name in RESTORE_BLACK_LIST
                 ):
 
                     print("-" * 80)
-                    print(f"Restored bypass {database.name}")
-                    remote_backup_names = _remove_database.name_from_remote_backup_names(
-                        database.name, remote_backup_names
+                    print(f"Restored bypass {database_name}")
+                    remote_backup_names = _remove_database_name_from_remote_backup_names(
+                        database_name, remote_backup_names
                     )
                     print("-" * 80)
                     continue
 
-                print(f"Start reset database {database.name}")
+                print(f"Start reset database {database_name}")
 
                 disconect_file = _generate_sql_to_drop_database(
-                    database.name, database_user, con, target_db["backup_dir"]
+                    database_name, database_user, con, target_db["backup_dir"]
                 )
 
                 # restore all files
                 for remote_backup_name in remote_backup_names:
-                    if database.name in remote_backup_name:
+                    if database_name in remote_backup_name:
                         database_restore_actions(
                             con,
-                            from_database.name,
-                            to_database.name,
+                            from_database_name,
+                            to_database_name,
                             remote_backup_name,
-                            database.name,
+                            database_name,
                             disconect_file,
                             to_db_host,
                             to_db_username,
@@ -248,25 +248,25 @@ def upload_all_files(local_backup_names, target_db, con):
 
 def database_restore_actions(
     con,
-    from_database.name,
-    to_database.name,
+    from_database_name,
+    to_database_name,
     remote_backup_name,
-    database.name,
+    database_name,
     disconect_file,
     to_db_host,
     to_db_username,
     from_db_username,
 ):
-    print(f"RESTORE BACKUP {remote_backup_name} in {database.name}")
+    print(f"RESTORE BACKUP {remote_backup_name} in {database_name}")
 
-    if from_database.name != to_database.name:
-        print(f"Rename database {from_database.name} to {to_database.name} in {disconect_file}")
+    if from_database_name != to_database_name:
+        print(f"Rename database {from_database_name} to {to_database_name} in {disconect_file}")
         # rename database name
-        con.sudo(f'sed -i "s/{from_database.name}/{to_database.name}/g" {disconect_file}')
+        con.sudo(f'sed -i "s/{from_database_name}/{to_database_name}/g" {disconect_file}')
 
-    print(f"DELETE DATABASE {database.name}")
+    print(f"DELETE DATABASE {database_name}")
     print(
-        f"Load {disconect_file} SQL in {to_db_host} with use: {to_db_username} to {to_database.name}"
+        f"Load {disconect_file} SQL in {to_db_host} with use: {to_db_username} to {to_database_name}"
     )
 
     # load database
@@ -276,10 +276,10 @@ def database_restore_actions(
     )
 
     print(
-        f"Load {remote_backup_name} SQL in {to_db_host} with use: {to_db_username} to {to_database.name}"
+        f"Load {remote_backup_name} SQL in {to_db_host} with use: {to_db_username} to {to_database_name}"
     )
     # load database
     con.sudo(
-        f"gunzip -k -c {remote_backup_name} | psql -U {to_db_username} -h {to_db_host} -d {to_database.name}",
+        f"gunzip -k -c {remote_backup_name} | psql -U {to_db_username} -h {to_db_host} -d {to_database_name}",
         hide=HIDE_OUTPUT,
     )

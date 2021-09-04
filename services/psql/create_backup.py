@@ -1,11 +1,16 @@
 import time
 from django.core.files.base import ContentFile
 from jobs.models import Backup, JOB_STATUS
-from services.ssh_connection import backup_connection
+from services.ssh_connection import inject_job_connection
 from tempfile import TemporaryFile
 import os
 
 DATE_NOW = time.strftime("%Y%m%d%H%M%S")
+
+
+def get_job_by_id(job_id):
+    "Method used in @inject_job_connection"
+    return Backup.objects.get(id=job_id)
 
 
 def create_name(job):
@@ -40,27 +45,26 @@ def download_backup_in_django_file(con, fname, server):
     return content
 
 
-@backup_connection
-def create_backup_file(backup_job_id=None, con=None):
+@inject_job_connection
+def create_backup_file(job_id=None, con=None, job=None):
     "Create backup file in server and download file"
-    backup_job = Backup.objects.get(id=backup_job_id)
-
-    if not backup_job:
-        print("Invalid backup_job_id: %s" % backup_job_id)
+    if not job:
+        print("Invalid job_id: %s" % job_id)
         return
 
-    database = backup_job.database
-    server = backup_job.server
+    database = job.database
+    server = job.server
 
-    fname = create_name(backup_job)
+    fname = create_name(job)
 
     dump_data_in_server(con=con, fname=fname, database=database, server=server)
 
     content = download_backup_in_django_file(con=con, fname=fname, server=server)
 
-    # save content file in backup_job
-    backup_job.filename = content
-    backup_job.status = JOB_STATUS.CREATED
-    backup_job.save()
+    # save content file in job
+    job.filename = content
+    # update job status
+    job.status = JOB_STATUS.DONE
+    job.save()
 
-    print(f"Backup for {backup_job.id} done")
+    print(f"Backup for {job.id} done")

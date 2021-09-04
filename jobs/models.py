@@ -9,7 +9,7 @@ from django.dispatch import receiver
 class JOB_STATUS(models.TextChoices):
     REQUEST = "REQUEST"
     QUEUE = "QUEUE"
-    CREATED = "CREATED"
+    DONE = "DONE"
     ERROR = "ERROR"
 
 

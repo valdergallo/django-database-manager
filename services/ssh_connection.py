@@ -1,6 +1,6 @@
 from functools import wraps
 from fabric import Connection
-from jobs.models import JOB_STATUS, Backup
+from jobs.models import JOB_STATUS
 
 
 def get_connection(server):
@@ -12,28 +12,29 @@ def get_connection(server):
     )
 
 
-def backup_connection(f):
+def inject_job_connection(f):
     @wraps(f)
     def wrapper(*args, **kwds):
         print("Starting connetion")
         if len(args):
-            backup_job_id = args[0]
+            job_id = args[0]
         else:
-            backup_job_id = kwds.get("backup_job_id")
+            job_id = kwds.get("job_id")
 
-        backup_job = Backup.objects.get(id=backup_job_id)
+        # Need implement one get_job_by_id before use this function
+        job = get_job_by_id(job_id)
 
-        if backup_job:
-            server = backup_job.server
+        if job:
+            server = job.server
             con = get_connection(server)
             try:
-                return f(*args, con=con, **kwds)
+                return f(*args, con=con, job=job, **kwds)
             except Exception as error:
-                backup_job.status = JOB_STATUS.ERROR
-                backup_job.error_logs = str(error)
-                backup_job.save()
+                job.status = JOB_STATUS.ERROR
+                job.error_logs = str(error)
+                job.save()
                 print("ERROR ", error)
             finally:
                 con.close()
-    return wrapper
 
+    return wrapper
