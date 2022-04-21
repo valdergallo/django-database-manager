@@ -7,13 +7,18 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('server', '0007_auto_20201107_1048'),
+        ("server", "0007_auto_20201107_1048"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='database',
-            name='storage_type',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='server.uploadstorageconfig'),
+            model_name="database",
+            name="storage_type",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="server.uploadstorageconfig",
+            ),
         ),
     ]

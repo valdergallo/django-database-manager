@@ -6,20 +6,20 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('server', '0011_auto_20201124_1831'),
+        ("server", "0011_auto_20201124_1831"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='uploadstorageconfig',
-            options={'verbose_name_plural': 'Upload Storage Configs'},
+            name="uploadstorageconfig",
+            options={"verbose_name_plural": "Upload Storage Configs"},
         ),
         migrations.RemoveField(
-            model_name='database',
-            name='host',
+            model_name="database",
+            name="host",
         ),
         migrations.RemoveField(
-            model_name='database',
-            name='ssl_key',
+            model_name="database",
+            name="ssl_key",
         ),
     ]

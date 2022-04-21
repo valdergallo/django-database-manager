@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('server', '0003_server_backup_dir'),
+        ("server", "0003_server_backup_dir"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='database',
-            name='password',
+            model_name="database",
+            name="password",
             field=models.CharField(blank=True, max_length=200, null=True),
         ),
         migrations.AlterField(
-            model_name='database',
-            name='ssl_key',
-            field=models.FileField(blank=True, null=True, upload_to='ssh_keys'),
+            model_name="database",
+            name="ssl_key",
+            field=models.FileField(blank=True, null=True, upload_to="ssh_keys"),
         ),
     ]

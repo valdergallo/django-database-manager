@@ -9,17 +9,32 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('server', '0001_initial'),
+        ("server", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ServerGroup',
+            name="ServerGroup",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=250)),
-                ('servers', models.ManyToManyField(to='server.Server')),
-                ('user', models.ForeignKey(editable=False, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=250)),
+                ("servers", models.ManyToManyField(to="server.Server")),
+                (
+                    "user",
+                    models.ForeignKey(
+                        editable=False,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

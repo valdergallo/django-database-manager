@@ -9,9 +9,13 @@ def get_job_by_id(job_id):
     return Restore.objects.get(id=job_id)
 
 
-def generate_sql_to_drop_database(database:Database, con, remote_backup_dir="/backups/"):
+def generate_sql_to_drop_database(
+    database: Database, con, remote_backup_dir="/backups/"
+):
     # create temp file to download
-    disconect_file = NamedTemporaryFile(delete=False, suffix=f'_{database.name}.sql', prefix='disconect_file_')
+    disconect_file = NamedTemporaryFile(
+        delete=False, suffix=f"_{database.name}.sql", prefix="disconect_file_"
+    )
 
     # get temporary filename
     filename = disconect_file.name
@@ -43,17 +47,21 @@ def generate_sql_to_drop_database(database:Database, con, remote_backup_dir="/ba
     return f"{remote_backup_dir}{base_name}"
 
 
-def rename_database_name_in_file(restore_job:Restore, target_file, con):
+def rename_database_name_in_file(restore_job: Restore, target_file, con):
     if restore_job.backup.database.name != restore_job.database.name:
         # rename database name
-        print(f"Rename database {restore_job.backup.database.name} to {restore_job.database.name} in {target_file}")
-        con.sudo(f'sed -i "s/{restore_job.backup.database.name}/{restore_job.database.name}/g" {target_file}')
+        print(
+            f"Rename database {restore_job.backup.database.name} to {restore_job.database.name} in {target_file}"
+        )
+        con.sudo(
+            f'sed -i "s/{restore_job.backup.database.name}/{restore_job.database.name}/g" {target_file}'
+        )
 
 
-def load_sqlfile_in_database(backup_file, database: Database, server: Server, con, hide_output=False):
-    print(
-        f"Load {backup_file} SQL in {database.username} with use: {server.host}"
-    )
+def load_sqlfile_in_database(
+    backup_file, database: Database, server: Server, con, hide_output=False
+):
+    print(f"Load {backup_file} SQL in {database.username} with use: {server.host}")
     # load database
     con.sudo(
         f"cat {backup_file} | psql -d postgres -U {database.username} -h {server.host}",
@@ -61,7 +69,9 @@ def load_sqlfile_in_database(backup_file, database: Database, server: Server, co
     )
 
 
-def load_ziped_sqlfile_in_database(backup_file, database: Database, server: Server, con, hide_output=False):
+def load_ziped_sqlfile_in_database(
+    backup_file, database: Database, server: Server, con, hide_output=False
+):
     print(
         f"Load {backup_file} SQL in {database.username} with use: {server.host} to {database.name}"
     )
@@ -72,10 +82,10 @@ def load_ziped_sqlfile_in_database(backup_file, database: Database, server: Serv
     )
 
 
-def upload_backup_file_to_server(backup, con, remote_backup_dir='/backups/', hide_output=False):
-    print(
-        f"Upload backup file to server"
-    )
+def upload_backup_file_to_server(
+    backup, con, remote_backup_dir="/backups/", hide_output=False
+):
+    print(f"Upload backup file to server")
     # upload disconect file to server
     con.put(backup.filename.path, remote_backup_dir)
     base_name = os.path.basename(backup.filename.path)
@@ -96,8 +106,12 @@ def restore_backup_file(job_id=None, con=None, job=None):
     drop_database_filename = generate_sql_to_drop_database(database, con)
     backup_filename = upload_backup_file_to_server(backup=backup, con=con)
 
-    load_sqlfile_in_database(backup_file=drop_database_filename, database=database, server=server)
-    load_ziped_sqlfile_in_database(backup_file=backup_filename, database=database, server=server)
+    load_sqlfile_in_database(
+        backup_file=drop_database_filename, database=database, server=server
+    )
+    load_ziped_sqlfile_in_database(
+        backup_file=backup_filename, database=database, server=server
+    )
 
     # update job status
     job.status = JOB_STATUS.DONE

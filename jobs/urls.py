@@ -6,9 +6,9 @@ from jobs.views import BackupModelViewSet, RestoreModelViewSet
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
-router.register(r'backups', BackupModelViewSet)
-router.register(r'restores', RestoreModelViewSet)
+router.register(r"backups", BackupModelViewSet)
+router.register(r"restores", RestoreModelViewSet)
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("", include(router.urls)),
 ]

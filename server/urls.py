@@ -11,11 +11,11 @@ from server.views import (
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
-router.register(r'upload_storages', UploadStorageConfigModelViewSet)
-router.register(r'connection_keys', ConnectionKeyModelViewSet)
-router.register(r'databases', DatabaseModelViewSet)
-router.register(r'servers', ServerModelViewSet)
+router.register(r"upload_storages", UploadStorageConfigModelViewSet)
+router.register(r"connection_keys", ConnectionKeyModelViewSet)
+router.register(r"databases", DatabaseModelViewSet)
+router.register(r"servers", ServerModelViewSet)
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("", include(router.urls)),
 ]

@@ -6,33 +6,33 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('server', '0005_auto_20201107_1029'),
+        ("server", "0005_auto_20201107_1029"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='server',
-            name='databases',
-            field=models.ManyToManyField(blank=True, null=True, to='server.Database'),
+            model_name="server",
+            name="databases",
+            field=models.ManyToManyField(blank=True, null=True, to="server.Database"),
         ),
         migrations.AlterField(
-            model_name='server',
-            name='host',
-            field=models.CharField(default='localhost', max_length=250),
+            model_name="server",
+            name="host",
+            field=models.CharField(default="localhost", max_length=250),
         ),
         migrations.AlterField(
-            model_name='server',
-            name='ssh_key',
-            field=models.FileField(blank=True, null=True, upload_to='ssh_keys'),
+            model_name="server",
+            name="ssh_key",
+            field=models.FileField(blank=True, null=True, upload_to="ssh_keys"),
         ),
         migrations.AlterField(
-            model_name='server',
-            name='ssh_key_pass',
+            model_name="server",
+            name="ssh_key_pass",
             field=models.CharField(blank=True, max_length=250, null=True),
         ),
         migrations.AlterField(
-            model_name='servergroup',
-            name='servers',
-            field=models.ManyToManyField(blank=True, null=True, to='server.Server'),
+            model_name="servergroup",
+            name="servers",
+            field=models.ManyToManyField(blank=True, null=True, to="server.Server"),
         ),
     ]

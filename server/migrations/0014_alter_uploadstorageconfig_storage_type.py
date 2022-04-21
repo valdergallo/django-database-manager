@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('server', '0013_auto_20210815_1312'),
+        ("server", "0013_auto_20210815_1312"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='uploadstorageconfig',
-            name='storage_type',
-            field=models.CharField(choices=[('AMS3', 'Amazon S3'), ('LOCAL', 'Local')], max_length=5),
+            model_name="uploadstorageconfig",
+            name="storage_type",
+            field=models.CharField(
+                choices=[("AMS3", "Amazon S3"), ("LOCAL", "Local")], max_length=5
+            ),
         ),
     ]

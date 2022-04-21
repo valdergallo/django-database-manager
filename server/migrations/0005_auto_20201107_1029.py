@@ -9,23 +9,41 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('server', '0004_auto_20201107_1018'),
+        ("server", "0004_auto_20201107_1018"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='database',
-            name='user',
-            field=models.ForeignKey(blank=True, editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="database",
+            name="user",
+            field=models.ForeignKey(
+                blank=True,
+                editable=False,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='server',
-            name='user',
-            field=models.ForeignKey(blank=True, editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="server",
+            name="user",
+            field=models.ForeignKey(
+                blank=True,
+                editable=False,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='servergroup',
-            name='user',
-            field=models.ForeignKey(blank=True, editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="servergroup",
+            name="user",
+            field=models.ForeignKey(
+                blank=True,
+                editable=False,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

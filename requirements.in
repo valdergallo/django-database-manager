@@ -1,0 +1,15 @@
+Django==4.0.4
+celery==5.2.2
+django-celery-results==2.2.0
+django-cors-headers==3.8.0
+django-reset-migrations==0.4.0
+djangorestframework==3.12.4
+djangorestframework==3.12.4
+
+# dev apps
+black==21.7b0
+pip-tools==6.6.0
+pre-commit==2.18.1
+isort==5.10.1
+django-pytest==0.2.0
+pytest==7.1.1

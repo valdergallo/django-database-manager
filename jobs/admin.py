@@ -1,10 +1,12 @@
 from django.contrib import admin
 from jobs.models import Backup, Restore
 
-@admin.action(description='Create backup from server')
+
+@admin.action(description="Create backup from server")
 def make_backup(modeladmin, request, queryset):
     for instance in queryset:
         instance.create_task()
+
 
 class BackupAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "status", "description", "database", "server")

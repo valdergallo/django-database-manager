@@ -12,35 +12,128 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('server', '0013_auto_20210815_1312'),
+        ("server", "0013_auto_20210815_1312"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Backup',
+            name="Backup",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=150)),
-                ('created_date', models.DateTimeField(auto_now_add=True)),
-                ('status', models.CharField(choices=[('REQUEST', 'Request'), ('QUEUE', 'Queue'), ('CREATED', 'Created'), ('ERROR', 'Error')], default='REQUEST', max_length=10)),
-                ('description', models.CharField(blank=True, max_length=500, null=True)),
-                ('filename', models.FileField(blank=True, null=True, upload_to=jobs.models.user_directory_path)),
-                ('database', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='server.database')),
-                ('server', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='server.server')),
-                ('user', models.ForeignKey(blank=True, editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=150)),
+                ("created_date", models.DateTimeField(auto_now_add=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("REQUEST", "Request"),
+                            ("QUEUE", "Queue"),
+                            ("CREATED", "Created"),
+                            ("ERROR", "Error"),
+                        ],
+                        default="REQUEST",
+                        max_length=10,
+                    ),
+                ),
+                (
+                    "description",
+                    models.CharField(blank=True, max_length=500, null=True),
+                ),
+                (
+                    "filename",
+                    models.FileField(
+                        blank=True, null=True, upload_to=jobs.models.user_directory_path
+                    ),
+                ),
+                (
+                    "database",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="server.database",
+                    ),
+                ),
+                (
+                    "server",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="server.server"
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        blank=True,
+                        editable=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Restore',
+            name="Restore",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_date', models.DateTimeField(auto_now_add=True)),
-                ('status', models.CharField(choices=[('REQUEST', 'Request'), ('QUEUE', 'Queue'), ('CREATED', 'Created'), ('ERROR', 'Error')], default='REQUEST', max_length=10)),
-                ('logs', models.TextField(blank=True, null=True)),
-                ('backup', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='jobs.backup')),
-                ('database', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='server.database')),
-                ('server', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='server.server')),
-                ('user', models.ForeignKey(blank=True, editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_date", models.DateTimeField(auto_now_add=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("REQUEST", "Request"),
+                            ("QUEUE", "Queue"),
+                            ("CREATED", "Created"),
+                            ("ERROR", "Error"),
+                        ],
+                        default="REQUEST",
+                        max_length=10,
+                    ),
+                ),
+                ("logs", models.TextField(blank=True, null=True)),
+                (
+                    "backup",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="jobs.backup"
+                    ),
+                ),
+                (
+                    "database",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="server.database",
+                    ),
+                ),
+                (
+                    "server",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="server.server"
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        blank=True,
+                        editable=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

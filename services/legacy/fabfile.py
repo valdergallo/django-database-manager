@@ -69,7 +69,6 @@ def _remove_database_name_from_remote_backup_names(database_name, remote_backup_
     return remote_backup_names
 
 
-
 def restore(
     con,
     server_name=None,
@@ -131,8 +130,10 @@ def restore(
 
                     print("-" * 80)
                     print(f"Restored bypass {database_name}")
-                    remote_backup_names = _remove_database_name_from_remote_backup_names(
-                        database_name, remote_backup_names
+                    remote_backup_names = (
+                        _remove_database_name_from_remote_backup_names(
+                            database_name, remote_backup_names
+                        )
                     )
                     print("-" * 80)
                     continue
@@ -179,7 +180,6 @@ def list_backups(arg, server_name, limit=10):
     for file in files[:limit][::-1]:
         last_update = time.ctime(os.path.getmtime(file))
         print(f"{last_update} | {file}")
-
 
 
 @task(
@@ -260,9 +260,13 @@ def database_restore_actions(
     print(f"RESTORE BACKUP {remote_backup_name} in {database_name}")
 
     if from_database_name != to_database_name:
-        print(f"Rename database {from_database_name} to {to_database_name} in {disconect_file}")
+        print(
+            f"Rename database {from_database_name} to {to_database_name} in {disconect_file}"
+        )
         # rename database name
-        con.sudo(f'sed -i "s/{from_database_name}/{to_database_name}/g" {disconect_file}')
+        con.sudo(
+            f'sed -i "s/{from_database_name}/{to_database_name}/g" {disconect_file}'
+        )
 
     print(f"DELETE DATABASE {database_name}")
     print(

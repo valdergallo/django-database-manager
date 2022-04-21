@@ -6,15 +6,15 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('server', '0010_auto_20201124_1751'),
+        ("server", "0010_auto_20201124_1751"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='connectionkeys',
-            options={'verbose_name_plural': 'Connection Keys'},
+            name="connectionkeys",
+            options={"verbose_name_plural": "Connection Keys"},
         ),
         migrations.DeleteModel(
-            name='ServerGroup',
+            name="ServerGroup",
         ),
     ]

@@ -7,23 +7,42 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('server', '0012_auto_20210815_1304'),
+        ("server", "0012_auto_20210815_1304"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='server',
-            name='ssh_key',
-            field=models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='server.connectionkeys'),
+            model_name="server",
+            name="ssh_key",
+            field=models.ForeignKey(
+                blank=True,
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="server.connectionkeys",
+            ),
         ),
         migrations.AlterField(
-            model_name='uploadstorageconfig',
-            name='config_vars',
+            model_name="uploadstorageconfig",
+            name="config_vars",
             field=models.TextField(blank=True, max_length=500, null=True),
         ),
         migrations.AlterField(
-            model_name='uploadstorageconfig',
-            name='storage_type',
-            field=models.CharField(choices=[('AMS3', 'Amazon S3'), ('ACLD', 'Apache Libcloud'), ('ASTG', 'Azure Storage'), ('DGON', 'Digital Ocean'), ('DRPB', 'Dropbox'), ('FTP', 'Ftp'), ('GCTG', 'Google Cloud Storage'), ('SFTP', 'Sftp'), ('LOCAL', 'Local')], max_length=5),
+            model_name="uploadstorageconfig",
+            name="storage_type",
+            field=models.CharField(
+                choices=[
+                    ("AMS3", "Amazon S3"),
+                    ("ACLD", "Apache Libcloud"),
+                    ("ASTG", "Azure Storage"),
+                    ("DGON", "Digital Ocean"),
+                    ("DRPB", "Dropbox"),
+                    ("FTP", "Ftp"),
+                    ("GCTG", "Google Cloud Storage"),
+                    ("SFTP", "Sftp"),
+                    ("LOCAL", "Local"),
+                ],
+                max_length=5,
+            ),
         ),
     ]
